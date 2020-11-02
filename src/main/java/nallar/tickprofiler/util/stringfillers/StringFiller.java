@@ -1,8 +1,9 @@
 package nallar.tickprofiler.util.stringfillers;
 
 public abstract class StringFiller {
-	public static final StringFiller CHAT = new ChatStringFiller();
-	public static final StringFiller FIXED_WIDTH = new StringFiller() {
+
+	public static StringFiller CHAT = new ChatStringFiller();
+	public static StringFiller FIXED_WIDTH = new StringFiller() {
 		@Override
 		public double getLength(String s) {
 			return s.length();
@@ -21,6 +22,6 @@ public abstract class StringFiller {
 	};
 
 	public abstract double getLength(String s);
-
 	public abstract String fill(String s, double requiredLength);
+
 }

@@ -15,34 +15,38 @@ import java.util.regex.*;
 
 @SuppressWarnings({"UnusedDeclaration", "UseOfSystemOutOrSystemErr"})
 public class Log {
-	public static final Logger LOGGER = Logger.getLogger("TickProfiler");
-	public static final boolean debug = System.getProperty("tickprofiler.debug") != null;
-	public static final Level DEBUG = new Level("DEBUG", Level.SEVERE.intValue(), null) {
+
+	public static Logger LOGGER = Logger.getLogger("TickProfiler");
+	public static boolean debug = System.getProperty("tickprofiler.debug") != null;
+	public static Level DEBUG = new Level("DEBUG", Level.SEVERE.intValue(), null) {
 		// Inner class as constructors are protected.
 	};
+
 	private static Handler handler;
-	private static final int numberOfLogFiles = Integer.getInteger("tickprofiler.numberOfLogFiles", 5);
-	private static final File logFolder;
+	private static int numberOfLogFiles = Integer.getInteger("tickprofiler.numberOfLogFiles", 5);
+	private static File logFolder;
 
 	static {
 		File logFolder_ = new File("TickProfilerLogs");
 		try {
-			if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			if(FMLCommonHandler.instance().getEffectiveSide().isClient())
 				logFolder_ = new File(Minecraft.getMinecraft().mcDataDir, "TickProfilerLogs");
-			}
 		} catch (Exception ignored) {
+
 		}
+
 		logFolder = logFolder_;
 	}
 
 	private static Handler wrappedHandler;
-	private static final Handler handlerWrapper = new Handler() {
+	private static Handler handlerWrapper = new Handler() {
 		Pattern pattern = Pattern.compile("\\P{Print}");
 
 		@Override
 		public void publish(final LogRecord record) {
 			String initialMessage = record.getMessage();
-			String sanitizedMessage = java.text.Normalizer.normalize(initialMessage, Normalizer.Form.NFC).replace("\r\n", "\n");
+			String sanitizedMessage = java.text.Normalizer.normalize(initialMessage,
+					Normalizer.Form.NFC).replace("\r\n", "\n");
 			sanitizedMessage = pattern.matcher(sanitizedMessage).replaceAll("");
 			record.setMessage(sanitizedMessage);
 			wrappedHandler.publish(record);
@@ -51,26 +55,28 @@ public class Log {
 
 		@Override
 		public void flush() {
+
 		}
 
 		@Override
 		public void close() throws SecurityException {
+
 		}
 	};
 
 	static {
 		try {
 			Logger parent = FMLLog.getLogger();
-			if (parent == null) {
-				throw new NoClassDefFoundError();
-			}
+			if(parent == null) throw new NoClassDefFoundError();
+
 			LOGGER.setParent(parent);
 			LOGGER.setUseParentHandlers(true);
+
 			setFileName("tickprofiler", Level.INFO, LOGGER);
 			Logger minecraftLogger = Logger.getLogger("Minecraft");
-			for (Handler handler : minecraftLogger.getHandlers()) {
-				if (handler instanceof TextAreaLogHandler) {
-					if (!Arrays.asList(parent.getHandlers()).contains(handlerWrapper)) {
+			for(Handler handler : minecraftLogger.getHandlers()) {
+				if(handler instanceof TextAreaLogHandler) {
+					if(!Arrays.asList(parent.getHandlers()).contains(handlerWrapper)) {
 						wrappedHandler = handler;
 						parent.addHandler(handlerWrapper);
 						break;
@@ -90,27 +96,30 @@ public class Log {
 
 				@Override
 				public void flush() {
+
 				}
 
 				@Override
 				public void close() throws SecurityException {
+
 				}
 			});
 		}
+
 		LOGGER.setLevel(Level.ALL);
 	}
 
 	public static synchronized void disableDiskWriting(String finalMessage) {
 		Handler handler = Log.handler;
-		if (handler == null) {
-			return;
-		}
+		if(handler == null) return;
+
 		Log.handler = null;
 		LogRecord finalRecord = new LogRecord(Level.SEVERE, finalMessage);
+
 		try {
 			Logger fmlLog = FMLLog.getLogger();
-			for (Handler handler1 : fmlLog.getHandlers()) {
-				if (handler1 instanceof FileHandler) {
+			for(Handler handler1 : fmlLog.getHandlers()) {
+				if(handler1 instanceof FileHandler) {
 					fmlLog.removeHandler(handler1);
 					handler1.publish(finalRecord);
 					handler1.flush();
@@ -119,45 +128,45 @@ public class Log {
 		} catch (NoClassDefFoundError ignored) {
 
 		}
+
 		handler.publish(finalRecord);
 		handler.flush();
+
 		LOGGER.removeHandler(handler);
 		Log.severe(finalMessage);
 	}
 
 	public static void setFileName(String name, final Level minimumLevel, Logger... loggers) {
 		logFolder.mkdir();
-		for (int i = numberOfLogFiles; i >= 1; i--) {
+		for(int i = numberOfLogFiles; i >= 1; i--) {
 			File currentFile = new File(logFolder, name + '.' + i + ".log");
-			if (currentFile.exists()) {
-				if (i == numberOfLogFiles) {
-					currentFile.delete();
-				} else {
-					currentFile.renameTo(new File(logFolder, name + '.' + (i + 1) + ".log"));
-				}
+			if(currentFile.exists()) {
+				if(i == numberOfLogFiles) currentFile.delete();
+				else currentFile.renameTo(new File(logFolder, name + '.' + (i + 1) + ".log"));
 			}
 		}
+
 		// TODO: Remove after two recommended builds
 		File oldNamingFile = new File(logFolder, name + ".log");
-		if (oldNamingFile.exists()) {
-			oldNamingFile.renameTo(new File(logFolder, name + ".2.log"));
-		}
+		if(oldNamingFile.exists()) oldNamingFile.renameTo(new File(logFolder, name + ".2.log"));
 		final File saveFile = new File(logFolder, name + ".1.log");
 		try {
 			RandomAccessFile randomAccessFile = new RandomAccessFile(saveFile, "rw");
+
 			try {
 				randomAccessFile.setLength(0);
 			} finally {
 				randomAccessFile.close();
 			}
+
 			//noinspection IOResourceOpenedButNotSafelyClosed
 			handler = new Handler() {
-				private final nallar.tickprofiler.LogFormatter logFormatter = new nallar.tickprofiler.LogFormatter();
-				private final BufferedWriter outputWriter = new BufferedWriter(new FileWriter(saveFile));
+				private nallar.tickprofiler.LogFormatter logFormatter = new nallar.tickprofiler.LogFormatter();
+				private BufferedWriter outputWriter = new BufferedWriter(new FileWriter(saveFile));
 
 				@Override
 				public void publish(LogRecord record) {
-					if (record.getLevel().intValue() >= minimumLevel.intValue()) {
+					if(record.getLevel().intValue() >= minimumLevel.intValue()) {
 						try {
 							outputWriter.write(logFormatter.format(record));
 						} catch (IOException ignored) {
@@ -171,6 +180,7 @@ public class Log {
 					try {
 						outputWriter.flush();
 					} catch (IOException ignored) {
+
 					}
 				}
 
@@ -183,7 +193,8 @@ public class Log {
 					}
 				}
 			};
-			for (Logger logger : loggers) {
+
+			for(Logger logger : loggers) {
 				logger.addHandler(handler);
 			}
 		} catch (IOException e) {
@@ -192,9 +203,7 @@ public class Log {
 	}
 
 	public static void flush() {
-		if (handler != null) {
-			handler.flush();
-		}
+		if(handler != null) handler.flush();
 	}
 
 	public static void debug(String msg) {
@@ -230,9 +239,8 @@ public class Log {
 	}
 
 	public static void debug(String msg, Throwable t) {
-		if (debug) {
-			LOGGER.log(DEBUG, msg, t);
-		} else {
+		if(debug) LOGGER.log(DEBUG, msg, t);
+		else {
 			throw new Error("Logged debug message when not in debug mode.");
 			// To prevent people logging debug messages which will just be ignored, wasting resources constructing the message.
 			// (s/people/me being lazy/ :P)
@@ -268,9 +276,7 @@ public class Log {
 	}
 
 	public static String name(World world) {
-		if (world.provider == null) {
-			return "Broken world with null world.provider";
-		}
+		if(world.provider == null) return "Broken world with null world.provider";
 		return world.provider.getDimensionName() + '/' + world.provider.dimensionId;
 	}
 
@@ -283,20 +289,19 @@ public class Log {
 	}
 
 	public static String toString(Object o) {
-		if (o instanceof World) {
-			return name((World) o);
-		}
+		if(o instanceof World) return name((World) o);
+
 		String cS = classString(o);
 		String s = o.toString();
-		if (!s.startsWith(cS)) {
-			s = cS + s;
-		}
-		if (o instanceof TileEntity) {
+
+		if(!s.startsWith(cS)) s = cS + s;
+		if(o instanceof TileEntity) {
 			TileEntity tE = (TileEntity) o;
-			if (!s.contains(" x, y, z: ")) {
-				s += " x, y, z: " + tE.xCoord + ", " + tE.yCoord + ", " + tE.zCoord;
-			}
+
+			if(!s.contains(" x, y, z: ")) s += " x, y, z: " + tE.xCoord +
+					", " + tE.yCoord + ", " + tE.zCoord;
 		}
+
 		return s;
 	}
 }

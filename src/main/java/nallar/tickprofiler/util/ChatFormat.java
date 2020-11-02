@@ -1,6 +1,7 @@
 package nallar.tickprofiler.util;
 
 public enum ChatFormat {
+
 	BLACK('0'),
 	DARK_BLUE('1'),
 	DARK_GREEN('2'),
@@ -23,10 +24,11 @@ public enum ChatFormat {
 	UNDERLINE('n'),
 	ITALIC('o'),
 	RESET('r');
+
 	public static final char FORMAT_CHAR = '\u00A7';
 	private final String toString;
 
-	private ChatFormat(char charCode) {
+	ChatFormat(char charCode) {
 		this.toString = new String(new char[]{FORMAT_CHAR, charCode});
 	}
 
@@ -34,4 +36,5 @@ public enum ChatFormat {
 	public String toString() {
 		return toString;
 	}
+
 }

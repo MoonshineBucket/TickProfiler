@@ -14,25 +14,29 @@ import java.util.*;
 * Used to override World.loadedTile/EntityList.
 * */
 public abstract class EntityList<T> extends ArrayList<T> {
-	private static final ContextAccess contextAccess = ContextAccess.$;
-	protected final ArrayList<T> innerList;
-	protected final World world;
-	private final Field overridenField;
+
+	private static ContextAccess contextAccess = ContextAccess.CONTEXT_ACCESS;
+	protected ArrayList<T> innerList;
+	protected World world;
+	private Field overridenField;
 
 	EntityList(World world, Field overriddenField) {
 		this.overridenField = overriddenField;
 		this.world = world;
+
 		overriddenField.setAccessible(true);
 		ArrayList<T> worldList = new ArrayList<T>();
+
 		try {
 			worldList = (ArrayList<T>) overriddenField.get(world);
-			if (worldList.getClass() != ArrayList.class) {
+			if(worldList.getClass() != ArrayList.class)
 				Log.severe("Another mod has replaced an entity list with " + Log.toString(worldList));
-			}
 		} catch (Throwable t) {
 			Log.severe("Failed to get " + overriddenField.getName() + " in world " + Log.name(world));
 		}
+
 		innerList = worldList;
+
 		try {
 			overriddenField.set(world, this);
 		} catch (Exception e) {
@@ -58,14 +62,16 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
 	@Override
 	public int size() {
-		boolean tick = EntityTickProfiler.profilingState != ProfileCommand.ProfilingState.NONE && World.class.isAssignableFrom(contextAccess.getContext(1));
-		if (tick) {
+		boolean tick = EntityTickProfiler.profilingState != ProfileCommand.ProfilingState.NONE &&
+				World.class.isAssignableFrom(contextAccess.getContext(1));
+		if(tick) {
 			Class secondCaller = contextAccess.getContext(2);
-			if (secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
+			if(secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
 				doTick();
 				return 0;
 			}
 		}
+
 		return innerList.size();
 	}
 
@@ -179,14 +185,16 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		boolean tick = EntityTickProfiler.profilingState != ProfileCommand.ProfilingState.NONE && World.class.isAssignableFrom(contextAccess.getContext(1));
-		if (tick) {
+		boolean tick = EntityTickProfiler.profilingState != ProfileCommand.ProfilingState.NONE &&
+				World.class.isAssignableFrom(contextAccess.getContext(1));
+		if(tick) {
 			Class secondCaller = contextAccess.getContext(2);
-			if (secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
+			if(secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
 				doTick();
 				return Collections.<T>emptyList().iterator();
 			}
 		}
+
 		return innerList.iterator();
 	}
 
@@ -194,4 +202,5 @@ public abstract class EntityList<T> extends ArrayList<T> {
 	public List<T> subList(final int fromIndex, final int toIndex) {
 		return innerList.subList(fromIndex, toIndex);
 	}
+
 }

@@ -14,6 +14,7 @@ import ru.tehkode.permissions.IPermissions;
 import java.util.*;
 
 public abstract class Command extends CommandBase {
+
 	protected boolean requireOp() {
 		return false;
 	}
@@ -21,39 +22,36 @@ public abstract class Command extends CommandBase {
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender commandSender) {
 		Boolean permission = null;
-		if (commandSender instanceof EntityPlayer) {
-			permission = checkPermission((EntityPlayer) commandSender);
-		}
-		if (permission != null) {
-			return permission;
-		}
+		if(commandSender instanceof EntityPlayer) permission = checkPermission((EntityPlayer) commandSender);
+		if(permission != null) return permission;
+
 		return !requireOp() || super.canCommandSenderUseCommand(commandSender);
 	}
 
 	private static IPermissions permissions;
 
 	public Boolean checkPermission(EntityPlayer entityPlayer) {
-		if (permissions == null) {
-			return null;
-		}
+		if(permissions == null) return null;
 		return permissions.has(entityPlayer, this.getClass().getName());
 	}
 
 	public static void sendChat(ICommandSender commandSender, String message) {
-		if (commandSender == MinecraftServer.getServer()) {
+		if(commandSender == MinecraftServer.getServer()) {
 			Log.info('\n' + message);
 			return;
 		}
-		while (message != null) {
+
+		while(message != null) {
 			int nlIndex = message.indexOf('\n');
 			String sent;
-			if (nlIndex == -1) {
+			if(nlIndex == -1) {
 				sent = message;
 				message = null;
 			} else {
 				sent = message.substring(0, nlIndex);
 				message = message.substring(nlIndex + 1);
 			}
+
 			commandSender.sendChatToPlayer(new ChatMessageComponent().addText(sent));
 		}
 	}
@@ -66,9 +64,9 @@ public abstract class Command extends CommandBase {
 	protected abstract void processCommand(ICommandSender commandSender, List<String> arguments);
 
 	public static void checkForPermissions() {
-		for (ModContainer modContainer : Loader.instance().getActiveModList()) {
+		for(ModContainer modContainer : Loader.instance().getActiveModList()) {
 			Object mod = modContainer.getMod();
-			if (mod instanceof IPermissions) {
+			if(mod instanceof IPermissions) {
 				Command.permissions = (IPermissions) mod;
 				Log.info("Using " + Log.toString(mod) + ':' + modContainer.getModId() + " as a permissions source.");
 				return;
@@ -82,4 +80,5 @@ public abstract class Command extends CommandBase {
 		// Necessary because generic types are stripped in minecraft, and deobfuscation doesn't add them back.
 		// This confuses javac for some reason - compareTo(object) actually is implemented in the superclass.
 	}
+
 }

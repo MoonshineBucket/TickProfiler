@@ -8,9 +8,10 @@ import java.util.*;
  * Derived from https://github.com/andfRa/Saga/blob/master/src/org/saga/utility/chat/ChatFiller.java
  */
 class ChatStringFiller extends StringFiller {
-	private static final double DEFAULT_LENGTH = 3.0 / 2.0;
-	private static final double MAX_GAP = 1.25;
-	private static final HashMap<Character, Double> SIZE_MAP = new HashMap<Character, Double>() {
+
+	private static double DEFAULT_LENGTH = 3.0 / 2.0;
+	private static double MAX_GAP = 1.25;
+	private static HashMap<Character, Double> SIZE_MAP = new HashMap<Character, Double>() {
 		{
 			put('i', 0.5);
 			put('k', 5.0 / 4.0);
@@ -67,6 +68,7 @@ class ChatStringFiller extends StringFiller {
 			put('\u2591', 2.0);
 		}
 	};
+
 	private static final HashSet<Character> FILL_CHARS = new HashSet<Character>() {
 		private static final long serialVersionUID = 1L;
 
@@ -80,47 +82,29 @@ class ChatStringFiller extends StringFiller {
 
 	@Override
 	public String fill(String str, double reqLength) {
-
 		char[] chars = str.toCharArray();
 
 		StringBuilder result = new StringBuilder();
 		double length = 0.0;
 
-		for (int i = 0; i < chars.length; i++) {
-
+		for(int i = 0; i < chars.length; i++) {
 			Double charLength = SIZE_MAP.get(chars[i]);
-			if (charLength == null) {
-				charLength = DEFAULT_LENGTH;
-			}
-
-			if (length + charLength > reqLength) {
-				break;
-			}
+			if(charLength == null) charLength = DEFAULT_LENGTH;
+			if(length + charLength > reqLength) break;
 
 			result.append(chars[i]);
-
-			if (!(chars[i] == ChatFormat.FORMAT_CHAR || (i > 0 && chars[i - 1] == ChatFormat.FORMAT_CHAR))) {
-				length += charLength;
-			}
+			if(!(chars[i] == ChatFormat.FORMAT_CHAR || (i > 0 && chars[i - 1] == ChatFormat
+					.FORMAT_CHAR))) length += charLength;
 		}
 
 		Character fillChar = ' ';
 		double fillLength = 1.0;
-		while (true) {
-
+		while(true) {
 			double gapLength = reqLength - length;
-
-			if (gapLength <= 0) {
-				break;
-			}
-
-			if (gapLength <= MAX_GAP) {
-
+			if(gapLength <= 0) break;
+			if(gapLength <= MAX_GAP) {
 				fillChar = findCustom(gapLength);
-				if (fillChar != null) {
-					result.append(fillChar);
-				}
-
+				if(fillChar != null) result.append(fillChar);
 				break;
 			}
 
@@ -128,23 +112,21 @@ class ChatStringFiller extends StringFiller {
 			length += fillLength;
 		}
 
-		return result.toString()
-				.replace("\u278A", ChatFormat.DARK_GRAY + "`" + ChatFormat.RESET)
-				.replace("\u278B", ChatFormat.DARK_GRAY + String.valueOf(ChatFormat.BOLD) + '`' + ChatFormat.RESET)
-				.replace("\u278C", ChatFormat.DARK_GRAY + String.valueOf(ChatFormat.BOLD) + ' ' + ChatFormat.RESET);
+		return result.toString().replace("\u278A", ChatFormat.DARK_GRAY +
+				"`" + ChatFormat.RESET).replace("\u278B", ChatFormat.DARK_GRAY +
+				String.valueOf(ChatFormat.BOLD) + '`' + ChatFormat.RESET).replace("\u278C",
+				ChatFormat.DARK_GRAY + String.valueOf(ChatFormat.BOLD) +
+						' ' + ChatFormat.RESET);
 	}
 
 	private static Character findCustom(double gapLen) {
-
 		Set<Character> gapStrs = new HashSet<Character>(FILL_CHARS);
 		double bestFitLen = -1.0;
+
 		Character bestFitStr = null;
-
-		for (Character gapStr : gapStrs) {
-
+		for(Character gapStr : gapStrs) {
 			double gapStrLen = SIZE_MAP.get(gapStr);
-
-			if (gapLen - gapStrLen >= 0 && gapStrLen > bestFitLen) {
+			if(gapLen - gapStrLen >= 0 && gapStrLen > bestFitLen) {
 				bestFitLen = gapStrLen;
 				bestFitStr = gapStr;
 			}
@@ -156,21 +138,16 @@ class ChatStringFiller extends StringFiller {
 	@Override
 	public double getLength(String str) {
 		char[] chars = str.toCharArray();
-
 		double length = 0.0;
 
-		for (int i = 0; i < chars.length; i++) {
-
+		for(int i = 0; i < chars.length; i++) {
 			Double charLength = SIZE_MAP.get(chars[i]);
-			if (charLength == null) {
-				charLength = DEFAULT_LENGTH;
-			}
-
-			if (!(chars[i] == ChatFormat.FORMAT_CHAR || (i > 0 && chars[i - 1] == ChatFormat.FORMAT_CHAR))) {
-				length += charLength;
-			}
+			if(charLength == null) charLength = DEFAULT_LENGTH;
+			if(!(chars[i] == ChatFormat.FORMAT_CHAR || (i > 0 && chars[i - 1] == ChatFormat
+					.FORMAT_CHAR))) length += charLength;
 		}
 
 		return length;
 	}
+
 }

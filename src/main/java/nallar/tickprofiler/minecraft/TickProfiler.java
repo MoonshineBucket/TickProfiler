@@ -19,10 +19,8 @@ import nallar.tickprofiler.minecraft.entitylist.EntityList;
 import nallar.tickprofiler.minecraft.entitylist.LoadedEntityList;
 import nallar.tickprofiler.minecraft.entitylist.LoadedTileEntityList;
 import nallar.tickprofiler.minecraft.profiling.EntityTickProfiler;
-import nallar.tickprofiler.reporting.Metrics;
 import nallar.tickprofiler.util.ReflectUtil;
 import nallar.tickprofiler.util.TableFormatter;
-import nallar.tickprofiler.util.VersionUtil;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -53,10 +51,6 @@ public class TickProfiler {
 	private int profilingInterval = 0;
 	private String profilingFileName = "world/computer/<computer id>/profile.txt";
 	private boolean profilingJson = false;
-
-	static {
-		new Metrics("TickProfiler", VersionUtil.versionNumber());
-	}
 
 	public TickProfiler() {
 		Log.LOGGER.getLevel(); // Force log class to load

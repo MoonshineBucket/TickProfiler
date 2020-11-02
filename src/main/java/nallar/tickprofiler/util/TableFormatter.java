@@ -7,10 +7,11 @@ import net.minecraft.entity.Entity;
 import java.util.*;
 
 public class TableFormatter {
-	public final StringFiller stringFiller;
-	public final StringBuilder sb = new StringBuilder();
-	private final List<String> currentHeadings = new ArrayList<String>();
-	private final List<String> currentData = new ArrayList<String>();
+
+	public StringFiller stringFiller;
+	public StringBuilder sb = new StringBuilder();
+	private List<String> currentHeadings = new ArrayList<String>();
+	private List<String> currentData = new ArrayList<String>();
 	public String splitter = " | ";
 	public String headingSplitter = " | ";
 	public String headingColour = "";
@@ -22,7 +23,7 @@ public class TableFormatter {
 	public TableFormatter(ICommandSender commandSender) {
 		boolean chat = commandSender instanceof Entity;
 		stringFiller = chat ? StringFiller.CHAT : StringFiller.FIXED_WIDTH;
-		if (chat) {
+		if(chat) {
 			splitter = " " + ChatFormat.YELLOW + '|' + ChatFormat.RESET + ' ';
 			headingSplitter = splitter;
 			headingColour = String.valueOf(ChatFormat.DARK_GREEN);
@@ -67,49 +68,52 @@ public class TableFormatter {
 		getMaxLengths(rowLengths, rowIndex, rowCount, currentHeadings);
 		getMaxLengths(rowLengths, rowIndex, rowCount, currentData);
 		String cSplit = "";
-		for (String heading : currentHeadings) {
+		for(String heading : currentHeadings) {
 			sb.append(cSplit).append(headingColour).append(stringFiller.fill(heading, rowLengths[rowIndex % rowCount]));
 			cSplit = headingSplitter;
 			rowIndex++;
 		}
+
 		sb.append('\n');
 		cSplit = "";
 		rowIndex = 0;
 		ArrayList<Map<String, String>> table = null;
-		if (recordTables) {
+		if(recordTables) {
 			table = new ArrayList<Map<String, String>>();
 			tables.add(table);
 		}
+
 		HashMap<String, String> entry = null;
-		for (String data : currentData) {
-			if (rowIndex % rowCount == 0 && table != null) {
+		for(String data : currentData) {
+			if(rowIndex % rowCount == 0 && table != null) {
 				entry = new HashMap<String, String>();
 				table.add(entry);
 			}
+
 			sb.append(cSplit).append(rowColour).append(stringFiller.fill(data, rowLengths[rowIndex % rowCount]));
 			cSplit = splitter;
-			if (entry != null) {
-				entry.put(currentHeadings.get(rowIndex % rowCount), data);
-			}
+
+			if(entry != null) entry.put(currentHeadings.get(rowIndex % rowCount), data);
+
 			rowIndex++;
-			if (rowIndex % rowCount == 0 && rowIndex != currentData.size()) {
+			if(rowIndex % rowCount == 0 && rowIndex != currentData.size()) {
 				sb.append('\n');
 				cSplit = "";
 			}
 		}
+
 		sb.append(tableSeparator);
 		currentHeadings.clear();
 		currentData.clear();
 	}
 
 	private int getMaxLengths(double[] rowLengths, int rowIndex, int rowCount, Iterable<String> stringIterable) {
-		for (String data : stringIterable) {
+		for(String data : stringIterable) {
 			double length = stringFiller.getLength(data);
-			if (rowLengths[rowIndex % rowCount] < length) {
-				rowLengths[rowIndex % rowCount] = length;
-			}
+			if(rowLengths[rowIndex % rowCount] < length) rowLengths[rowIndex % rowCount] = length;
 			rowIndex++;
 		}
+
 		return rowIndex;
 	}
 
@@ -119,21 +123,22 @@ public class TableFormatter {
 	 * http://stackoverflow.com/a/10554128/250076
 	 */
 	public static String formatDoubleWithPrecision(double val, int precision) {
-		if (Double.isInfinite(val) || Double.isNaN(val)) {
-			return Double.toString(val);
-		}
+		if(Double.isInfinite(val) || Double.isNaN(val)) return Double.toString(val);
 		StringBuilder sb = new StringBuilder();
-		if (val < 0) {
+		if(val < 0) {
 			sb.append('-');
 			val = -val;
 		}
+
 		int exp = POW10[precision];
 		long lval = (long) (val * exp + 0.5);
 		sb.append(lval / exp).append('.');
 		long fval = lval % exp;
-		for (int p = precision - 1; p > 0 && fval < POW10[p]; p--) {
+
+		for(int p = precision - 1; p > 0 && fval < POW10[p]; p--) {
 			sb.append('0');
 		}
+
 		sb.append(fval);
 		return sb.toString();
 	}
@@ -151,4 +156,5 @@ public class TableFormatter {
 	public List getTables() {
 		return tables;
 	}
+
 }

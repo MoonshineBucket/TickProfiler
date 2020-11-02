@@ -17,8 +17,9 @@ public enum ReflectUtil {
 			try {
 				field = c.getDeclaredField(name);
 			} catch (NoSuchFieldException ignored) {
+
 			}
-		} while (field == null && (c = c.getSuperclass()) != Object.class);
+		} while(field == null && (c = c.getSuperclass()) != Object.class);
 		field.setAccessible(true);
 		return field;
 	}
@@ -26,15 +27,13 @@ public enum ReflectUtil {
 	private static Method getMethod(Class c, String name) {
 		Method method = null;
 		do {
-			for (Method method_ : c.getDeclaredMethods()) {
-				if (method_.getName().equals(name)) {
-					if (method != null) {
-						Log.severe("Two possible matches: " + method + ", " + method_);
-					}
+			for(Method method_ : c.getDeclaredMethods()) {
+				if(method_.getName().equals(name)) {
+					if(method != null) Log.severe("Two possible matches: " + method + ", " + method_);
 					method = method_;
 				}
 			}
-		} while (method == null && (c = c.getSuperclass()) != Object.class);
+		} while(method == null && (c = c.getSuperclass()) != Object.class);
 		method.setAccessible(true);
 		return method;
 	}
@@ -66,11 +65,10 @@ public enum ReflectUtil {
 	public static Field[] getFields(Class<?> clazz, Class<?> fieldType) {
 		List<Field> listFields = new ArrayList<Field>();
 		List<Field> fields = Arrays.asList(clazz.getDeclaredFields());
-		for (Field field : fields) {
-			if (fieldType.isAssignableFrom(field.getType())) {
-				listFields.add(field);
-			}
+		for(Field field : fields) {
+			if(fieldType.isAssignableFrom(field.getType())) listFields.add(field);
 		}
+
 		return listFields.toArray(new Field[listFields.size()]);
 	}
 }

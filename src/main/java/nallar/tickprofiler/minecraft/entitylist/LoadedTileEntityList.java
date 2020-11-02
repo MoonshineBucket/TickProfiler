@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import java.lang.reflect.*;
 
 public class LoadedTileEntityList extends EntityList<TileEntity> {
+
 	public LoadedTileEntityList(World world, Field overriddenField) {
 		super(world, overriddenField);
 	}
@@ -15,4 +16,5 @@ public class LoadedTileEntityList extends EntityList<TileEntity> {
 	public void tick() {
 		EntityTickProfiler.ENTITY_TICK_PROFILER.runTileEntities(world, innerList);
 	}
+
 }
