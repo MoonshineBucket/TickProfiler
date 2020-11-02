@@ -1,0 +1,16 @@
+[
+{
+	"modid": "TickProfiler",
+	"name": "TickProfiler",
+	"description": "A small mod for servers to assist with finding which TileEntities(machines) and Entities are being slow.",
+	"version": "${version}",
+	"mcversion": "${mcversion}",
+	"url": "http://nallar.me/minecraft/",
+	"updateUrl": "http://nallar.me/buildservice/job/TickProfiler/lastSuccessfulBuild/artifact/target/",
+	"authorList": [ "nallar" ],
+	"credits": "Authored by nallar",
+	"screenshots": [],
+	"parent":"",
+	"dependencies": []
+}
+]
